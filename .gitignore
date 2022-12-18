@@ -1,0 +1,17 @@
+.DS_Store
+.vs
+.vscode
+Thumbs.db
+
+*.exe
+*.log
+*.out
+*.prof
+*.so
+
+logs/
+node_modules/
+releases/
+reports/
+tmp/
+vendor/
