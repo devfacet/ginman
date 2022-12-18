@@ -38,11 +38,11 @@ test:
 
 ## test-go          Run go test
 test-go:
-	@find . -type f -name '*.go' | grep -v -E '^./vendor|^./third_party|^./examples' | xargs -L1 dirname | sort | uniq | xargs go test -v -race
+	@find . -type f -name '*.go' | grep -v -E '^./vendor|^./third_party|^./_examples' | xargs -L1 dirname | sort | uniq | xargs go test -v -race
 
 ## test-benchmarks  Run go benchmarks
 test-benchmarks:
-	@find . -type f -name '*.go' | grep -v -E '^./vendor|^./third_party|^./examples' | xargs -L1 dirname | sort | uniq | xargs go test -benchmem -bench
+	@find . -type f -name '*.go' | grep -v -E '^./vendor|^./third_party|^./_examples' | xargs -L1 dirname | sort | uniq | xargs go test -benchmem -bench
 
 ## test-ui          Launch test UI
 test-ui:
@@ -50,7 +50,7 @@ test-ui:
 	@if [ -z "$(GOCONVEY_PATH)" ]; then \
 		GO111MODULE=off go get github.com/smartystreets/goconvey; \
 	fi
-	goconvey -port 8088 -excludedDirs vendor,node_modules,assets,examples
+	goconvey -port 8088 -excludedDirs vendor,node_modules,assets,_examples
 
 ## test-clean       Clean test cache
 test-clean:
