@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,11 +19,12 @@ import (
 
 // Response represents an HTTP response.
 type Response struct {
-	Code     int           `json:"code,omitempty"`
-	Status   string        `json:"status,omitempty"`
-	Error    interface{}   `json:"error,omitempty"`
-	Redirect string        `json:"-"`
-	Sleep    time.Duration `json:"-"`
+	Code             int           `json:"code,omitempty"`
+	Status           string        `json:"status,omitempty"`
+	Error            interface{}   `json:"error,omitempty"`
+	Redirect         string        `json:"-"`
+	RedirectResponse bool          `json:"-"`
+	Sleep            time.Duration `json:"-"`
 }
 
 // Reply replies an HTTP request by the Response instance and the given trailing arguments.
@@ -63,12 +66,22 @@ func (resp *Response) Reply(c *gin.Context, responses ...interface{}) {
 
 	// Check the redirect
 	if resp.Redirect != "" {
-		b, err := json.Marshal(obj)
-		if err != nil {
+		if resp.RedirectResponse {
+			b, err := json.Marshal(obj)
+			if err != nil {
+				c.Redirect(302, resp.Redirect)
+				return
+			}
+			urlValues := url.Values{}
+			urlValues.Set("response", base64.RawURLEncoding.EncodeToString(b))
+			if strings.Contains(resp.Redirect, "?") {
+				c.Redirect(302, fmt.Sprintf("%s&%s", resp.Redirect, urlValues.Encode()))
+			} else {
+				c.Redirect(302, fmt.Sprintf("%s?%s", resp.Redirect, urlValues.Encode()))
+			}
+		} else {
 			c.Redirect(302, resp.Redirect)
-			return
 		}
-		c.Redirect(302, fmt.Sprintf("%s?response=%s", resp.Redirect, base64.RawURLEncoding.EncodeToString(b)))
 		return
 	}
 
